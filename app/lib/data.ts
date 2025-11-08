@@ -11,6 +11,14 @@ import { formatCurrency } from './utils';
 
 const sql = postgres(process.env.POSTGRES_URL!, { ssl: 'require' });
 
+export class NotFoundError extends Error {
+  status = 404;
+  constructor(message?: string) {
+    super(message ?? 'Not Found');
+    this.name = 'NotFoundError';
+  }
+}
+
 export async function fetchRevenue() {
   try {
     // Artificially delay a response for demo purposes.
@@ -160,8 +168,15 @@ export async function fetchInvoiceById(id: string) {
       amount: invoice.amount / 100,
     }));
 
-    return invoice[0];
+    const result = invoice[0];
+    if (!result) {
+      // invoice not found
+      throw new NotFoundError(`Invoice with id ${id} not found`);
+    }
+
+    return result;
   } catch (error) {
+    if (error instanceof NotFoundError) throw error;
     console.error('Database Error:', error);
     throw new Error('Failed to fetch invoice.');
   }
