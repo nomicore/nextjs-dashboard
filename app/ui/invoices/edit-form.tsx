@@ -1,6 +1,6 @@
 'use client';
 
-import { updateInvoice } from '@/app/lib/actions';
+import { updateInvoice, State } from '@/app/lib/actions';
 import { CustomerField, InvoiceForm } from '@/app/lib/definitions';
 import {
   CheckIcon,
@@ -10,6 +10,7 @@ import {
 } from '@heroicons/react/24/outline';
 import Link from 'next/link';
 import { Button } from '@/app/ui/button';
+import { useActionState } from 'react';
 
 export default function EditInvoiceForm({
   invoice,
@@ -18,10 +19,26 @@ export default function EditInvoiceForm({
   invoice: InvoiceForm;
   customers: CustomerField[];
 }) {
-  const updateInvoiceWithId = updateInvoice.bind(null, invoice.id);
+  const initialState: State = { message: null, errors: {} };
+  // useActionState expects an action with the shape (prevState, formData)
+  // createInvoice follows that signature, but updateInvoice's runtime
+  // signature is (id, formData). Wrap it so the bound action matches
+  // the expected (prevState, formData) call signature.
+  const updateInvoiceWithId = (
+    prevState: State,
+    formData: FormData,
+  ) => updateInvoice(invoice.id, formData);
+
+  // The server action wrapper has the same runtime behavior as the
+  // other actions, but TypeScript's overloads for useActionState are
+  // picky. Narrowing with `as any` keeps the types simple here.
+  const [state, formAction] = useActionState(
+    updateInvoiceWithId as any,
+    initialState as any,
+  );
 
   return (
-    <form action={updateInvoiceWithId}>
+    <form action={formAction}>
       <div className="rounded-md bg-gray-50 p-4 md:p-6">
         {/* Customer Name */}
         <div className="mb-4">
