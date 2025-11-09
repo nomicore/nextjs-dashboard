@@ -16,3 +16,15 @@ input[type='number']::-webkit-outer-spin-button {
   -webkit-appearance: none;
   margin: 0;
 }
+
+.banner {
+  background-image: url('/banner.png');
+  background-size: cover;
+  background-position: center;
+}
+
+.car-list h2 {
+  font-weight: bold;
+  text-align: center;
+  padding-top: 12px;
+}
