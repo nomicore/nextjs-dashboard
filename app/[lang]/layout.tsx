@@ -13,11 +13,13 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
+  params,
 }: {
   children: React.ReactNode;
+  params: Promise<{ lang: string }>;
 }) {
   return (
-    <html lang="en">
+    <html lang="{lang}">
       <body className={`${inter.className} antialiased`}>{children}</body>
     </html>
   );
